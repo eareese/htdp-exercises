@@ -1,11 +1,12 @@
 #lang htdp/bsl
 
+; change cost: no base cost, but $1.5 per attendee
 (define BASE-ATTENDANCE 120)
 (define BASE-PRICE 5.0)
 (define ATT-CHANGE 15)
 (define PRICE-CHANGE 0.1)
-(define BASE-COST 180)
-(define COST-PER-ATT 0.04)
+(define BASE-COST 0)
+(define COST-PER-ATT 1.5)
 
 ; number of attendees depends on ticket price
 (define (attendees ticket-price)
@@ -26,16 +27,9 @@
   (- (revenue ticket-price)
      (cost ticket-price)))
 
-(exact->inexact (profit 1.0))
-(exact->inexact (profit 2.0))
 (exact->inexact (profit 3.0))
 (exact->inexact (profit 4.0))
 (exact->inexact (profit 5.0))
-"---"
-
-(exact->inexact (profit 2.8))
-(exact->inexact (profit 2.9))
-(exact->inexact (profit 3.0))
 
 #| another version |#
 (define (profit2 price)
@@ -43,20 +37,13 @@
            (* (/ 15 0.1)
               (- 5.0 price)))
         price)
-     (+ 180
-        (* 0.04
+     (+ 0
+        (* 1.5
            (+ 120
               (* (/ 15 0.1)
                  (- 5.0 price)))))))
 
-"===V2==="
-(exact->inexact (profit2 1.0))
-(exact->inexact (profit2 2.0))
+"--version 2--"
 (exact->inexact (profit2 3.0))
 (exact->inexact (profit2 4.0))
 (exact->inexact (profit2 5.0))
-"---"
-
-(exact->inexact (profit2 2.8))
-(exact->inexact (profit2 2.9))
-(exact->inexact (profit2 3.0))

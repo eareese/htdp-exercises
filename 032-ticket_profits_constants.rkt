@@ -7,11 +7,13 @@
 (define BASE-COST 180)
 (define COST-PER-ATT 0.04)
 
+(define PRICE-SENSITIVITY (/ ATT-CHANGE PRICE-CHANGE))
+
 ; number of attendees depends on ticket price
 (define (attendees ticket-price)
   (- BASE-ATTENDANCE
      (* (- ticket-price BASE-PRICE)
-        (/ ATT-CHANGE PRICE-CHANGE))))
+        PRICE-SENSITIVITY)))
 
 ; revenue is ticket price times number of attendees
 (define (revenue ticket-price)
@@ -36,27 +38,3 @@
 (exact->inexact (profit 2.8))
 (exact->inexact (profit 2.9))
 (exact->inexact (profit 3.0))
-
-#| another version |#
-(define (profit2 price)
-  (- (* (+ 120
-           (* (/ 15 0.1)
-              (- 5.0 price)))
-        price)
-     (+ 180
-        (* 0.04
-           (+ 120
-              (* (/ 15 0.1)
-                 (- 5.0 price)))))))
-
-"===V2==="
-(exact->inexact (profit2 1.0))
-(exact->inexact (profit2 2.0))
-(exact->inexact (profit2 3.0))
-(exact->inexact (profit2 4.0))
-(exact->inexact (profit2 5.0))
-"---"
-
-(exact->inexact (profit2 2.8))
-(exact->inexact (profit2 2.9))
-(exact->inexact (profit2 3.0))
