@@ -1,0 +1,16 @@
+Exercise 34. Most people no longer use desktop computers to run applications but cell phones, tablets, and their cars’ information control screens. Soon people will use wearable computers in the form of intelligent glasses, clothes, and sports gear. In the somewhat more distant future, people may come with built-in bio computers that directly interact with body functions. Think of ten different forms of events that software applications on such computers will have to deal with.
+
+events that such computers (built-in bio computers?) have to deal with
+
+1. unexpected injury
+2. somehow sensing extreme feelz
+3. respond to minor fluctuations in body (nbd)
+4. respond to important fluctuations (blood sugar / diabetes, bp, etc)
+5. respond(?) to aging
+6. sleep
+7. somehow on the molecular level? as cellular respiration
+a process that takes certain "ingredients" and undergoes some process to produce certain output
+8. (assist in) processing sensory input
+9. fart
+10. food digestion (resource allocation, garbage removal)
+

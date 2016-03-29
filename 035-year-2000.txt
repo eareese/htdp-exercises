@@ -1,0 +1,5 @@
+Research the "year 2000" problem and what it meant for programmers.
+
+People became concerned about "Y2K" because some computer programs existed that described years by only two digits, and thus they could not be relied on to handle dates like 2000 "instead of the familiar '19.'"
+
+http://www.natlawreview.com/article/does-anyone-remember-y2k-california-does
