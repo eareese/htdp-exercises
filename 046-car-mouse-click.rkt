@@ -2,6 +2,11 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
+; Sample Problem: Design a program that moves a car across the world canvas,
+; from left to right, at the rate of three pixels per clock tick. If the mouse
+; is clicked anywhere on the canvas, the car is placed at the x-coordinate of
+; that point.
+
 (define tree
   (underlay/xy (circle 10 "solid" "green")
                9 15
@@ -58,12 +63,12 @@
 
 ; clock-tick-handler
 ; AnimationState -> AnimationState
-; adds 1 to anim-state
+; adds 3 to anim-state
 ; example:
-; given: 20, expect 21
-; given: 4003, expect 4004
+; given: 20, expect 23
+; given: 4003, expect 4006
 (define (tock anim-state)
-  (+ anim-state 1))
+  (+ anim-state 3))
 
 ; end?
 ; AnimationState -> boolean
@@ -75,17 +80,34 @@
 (define (last-state anim-state)
   (>= anim-state 500))
 
+; mouse-event-handler
+; WorldState Number Number String -> WorldState
+; places the car at the x-coordinate if me is "button-down"
+; given: 21 10 20 "enter"
+; wanted: 21
+; given: 42 10 20 "button-down"
+; wanted: 10
+; given: 42 10 20 "move"
+; wanted: 42
+(define (hyper x-position-of-car x-mouse y-mouse me)
+  x-position-of-car)
+
 
 ; AnimationState -> AnimationState
 ; launches the program from some initial state
 (define (main anim-state)
   (big-bang anim-state
             [on-tick tock]
+            [on-mouse hyper]
             [to-draw render]
             [stop-when last-state]))
 
-(main 100)
+(main 50)
 
 (check-expect (render 50) (place-image CAR 50 Y-CAR BACKGROUND))
 (check-expect (render 200) (place-image CAR 200 Y-CAR BACKGROUND))
+
+(check-expect (hyper 21 10 20 "enter") 21)
+(check-expect (hyper 42 10 20 "button-down") 10)
+(check-expect (hyper 42 10 20 "move") 42)
 
