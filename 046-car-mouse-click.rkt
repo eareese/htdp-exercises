@@ -81,7 +81,7 @@
   (>= anim-state 500))
 
 ; mouse-event-handler
-; WorldState Number Number String -> WorldState
+; AnimState Number Number String -> AnimState
 ; places the car at the x-coordinate if me is "button-down"
 ; given: 21 10 20 "enter"
 ; wanted: 21
@@ -90,7 +90,9 @@
 ; given: 42 10 20 "move"
 ; wanted: 42
 (define (hyper x-position-of-car x-mouse y-mouse me)
-  x-position-of-car)
+  (cond
+    [(string=? me "button-down") x-mouse]
+    [else x-position-of-car]))
 
 
 ; AnimationState -> AnimationState
@@ -102,12 +104,9 @@
             [to-draw render]
             [stop-when last-state]))
 
-(main 50)
+(main 1)
 
-(check-expect (render 50) (place-image CAR 50 Y-CAR BACKGROUND))
-(check-expect (render 200) (place-image CAR 200 Y-CAR BACKGROUND))
-
-(check-expect (hyper 21 10 20 "enter") 21)
 (check-expect (hyper 42 10 20 "button-down") 10)
+(check-expect (hyper 21 10 20 "enter") 21)
 (check-expect (hyper 42 10 20 "move") 42)
 

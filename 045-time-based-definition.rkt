@@ -86,6 +86,11 @@
 
 (main 100)
 
-(check-expect (render 50) (place-image CAR 50 Y-CAR BACKGROUND))
-(check-expect (render 200) (place-image CAR 200 Y-CAR BACKGROUND))
+(check-expect
+ (render 50) (place-image/align CAR
+                               50
+                               Y-CAR
+                               "right"
+                               "center"
+                               BACKGROUND))
 
