@@ -1,0 +1,21 @@
+Intervals and the integers they contain
+
+[3,5]
+closed interval
+contains:
+3, 4, 5
+
+(3,5]
+left-open interval
+contains:
+4, 5
+
+[3,5)
+right-open interval
+contains:
+3, 4
+
+(3,5)
+open interval
+contains:
+4
