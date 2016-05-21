@@ -23,20 +23,19 @@
 ; LRCD -> Image
 ; renders the state as a resting or flying rocket
 ; NOTE: there is a test per subclass in the data definition.
-(check-expect
- (show "resting")
+(check-expect (show "resting")
  (place-image ROCKET
               ROCKET-X (- HEIGHT ROCKET-CENTER)
               BACKG))
-(check-expect
- (show -2)
+(check-expect (show 0)
+              (place-image ROCKET ROCKET-X (- 0 ROCKET-CENTER) BACKG))
+(check-expect (show -2)
  (place-image (text "-2" 20 "red")
               ROCKET-X (* 3/4 HEIGHT)
               (place-image ROCKET
                            ROCKET-X (- HEIGHT ROCKET-CENTER)
                            BACKG)))
-(check-expect
- (show 53)
+(check-expect (show 53)
  (place-image ROCKET ROCKET-X (- 53 ROCKET-CENTER) BACKG))
 
 (check-expect
@@ -76,8 +75,17 @@
 
 ; LRCD -> LRCD
 ; raises the rocket by YDELTA, if it is moving already
+(check-expect (fly "resting") "resting")
+(check-expect (fly -3) -2)
+(check-expect (fly -2) -1)
+(check-expect (fly -1) HEIGHT)
+(check-expect (fly 10) (- 10 YDELTA))
+(check-expect (fly 22) (- 22 YDELTA))
 (define (fly x)
-  x)
+  (cond
+    [(string? x) x]
+    [(<= -3 x -1) (if (= x -1) HEIGHT (+ x 1))]
+    [(> x 0) (- x YDELTA)]))
 
 ; LRCD -> Image
 ; draws the rocket resting or in flight
@@ -87,10 +95,25 @@
   (place-image ROCKET ROCKET-X (- x ROCKET-CENTER) BACKG))
 
 
+; LRCD -> Boolean
+; stop and reset when the rocket leaves the top of world
+(define (gone s)
+  (cond
+    [(and (number? s)
+          (= s 0)) #t]
+    [else #f]))
+
 ; LRCD -> LRCD
 (define (main1 s)
   (big-bang s
             [to-draw show]
             [on-key launch]))
+(define (main2 s)
+  (big-bang s
+            [to-draw show]
+            [on-tick fly 0.1]
+            [stop-when gone]
+            [close-on-stop #t]
+            [on-key launch]))
 
-(main1 "resting")
+(main2 "resting")
