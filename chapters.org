@@ -1,9 +1,0 @@
-* I. Fixed-Size Data
-** chapter 1
-ex. 1-12
-** chapter 2
-ex. 13-34
-** chapter 3
-ex. 35-49
-** chapter 4
-ex. 50-
