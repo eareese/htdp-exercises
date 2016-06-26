@@ -2,8 +2,8 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
-(define cat1 (bitmap "images/cat1.png"))
-(define cat2 (bitmap "images/cat2.png"))
+(define cat1 (bitmap "../images/cat1.png"))
+(define cat2 (bitmap "../images/cat2.png"))
 
 (define CAT-Y 250)
 
