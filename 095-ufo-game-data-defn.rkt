@@ -2,6 +2,11 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
+;; Exercise 95. Explain why the three instances are generated according to the
+;; first or second clause of the data definition.
+;; > See line 33.
+
+
 ;; Structure type definitions
 
 ;; the time period when the player is trying to get the tank in position for a shot

@@ -1,11 +1,21 @@
 #lang htdp/bsl
 (require 2htdp/image)
 
+;; Exercise 97. A programmer has chosen to represent locations on the Cartesian
+;; plane as pairs (x, y) or as single numbers if the point lies on one of the
+;; axes:
+;
 ; Location is one of:
-; - Posn
-; - Number
-; interpretation Posn are positions on the Cartesian plane. Numbers are
-; positions on either the x- or the y-axis.
+; – Posn
+; – Number
+; interpretation Posn are positions on the Cartesian plane,
+; Numbers are positions on either the x- or the y-axis.
+;
+;; Design the function in-reach?, which determines whether a given location’s
+;; distance to the origin is strictly less than some constant R.
+;
+;; Note This function has no connection to any other material in this chapter.
+
 
 ; in-reach?
 ;; Location Number -> Boolean

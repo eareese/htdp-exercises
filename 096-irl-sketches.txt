@@ -1,1 +1,3 @@
-irl sketch the scenes from exercise 95
+Exercise 96. Sketch how each of the three game states could be rendered assuming a 200 by 200 canvas.
+
+[ sketching irl ]

@@ -2,23 +2,22 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
-;; Design a game program using the 2htdp/universe library for playing a simple
-;; space invader game. The player is in control of a tank (a small rectangle)
-;; that must defend our planet (the bottom of the canvas) from a UFO (see
-;; Intervals for one possibility) that descends from the top of the canvas to
-;; the bottom. In order to stop the UFO from landing, the player may fire a
-;; single missile (a triangle smaller than the tank) by hitting the space bar.
-;; In response, the missile emerges from the tank. If the UFO collides with the
-;; missile, the player wins; otherwise the UFO lands and the player loses.
-
-;; Here are some details concerning the three game objects and their movements.
-;; First, the tank moves a constant speed along the bottom of the canvas though
-;; the player may use the left arrow key and the right arrow key to change
-;; directions. Second, the UFO descends at a constant velocity but makes small
-;; random jumps to the left or right. Third, once fired the missile ascends
-;; along a straight vertical line at a constant speed at least twice as fast as
-;; the UFO descends. Finally, the UFO and the missile collide if their reference
-;; points are close enough, for whatever you think “close enough” means.
+;; Exercise 98. Design the functions tank-render, ufo-render, and
+;; missile-render. Is the result of this expression
+;
+;; ... (tank-render (fired-tank s)
+;;                  (ufo-render (fired-ufo s)
+;;                              (missile-render (fired-missile s)
+;;                                              BACKGROUND))) ...
+;
+;; the same as the result of
+;
+;; ... (ufo-render (fired-ufo s)
+;;                 (tank-render (fired-tank s)
+;;                              (missile-render (fired-missile s)
+;;                                              BACKGROUND))) ...
+;
+;; When do the two expressions produce the same result?
 
 
 ;; Structure type definitions
@@ -108,16 +107,3 @@
 ; position such that it overlaps with the tank. in the commented expression, the
 ; ufo would overlap the tank.
 
-(si-render (make-fired
-            (make-posn 20 100)
-            (make-tank 100 3)
-            (make-posn 22 103)))
-
-
-
-;; INITIAL SCENE
-(place-images
- (list UFO TANK)
- (list (make-posn (* 1/2 (image-width BACKGROUND)) (image-height UFO))
-       (make-posn (* 1/2 (image-width BACKGROUND)) TANK-Y))
- BACKGROUND)
