@@ -31,6 +31,3 @@
         [(and (eq? #f (first alob)) (empty? (rest alob))) #f]
         [(cons? alob)
          (if (eq? #t (first alob)) #t (one-true (rest alob)))]))
-
-; TODO: improve code quality, lol im lazy
-

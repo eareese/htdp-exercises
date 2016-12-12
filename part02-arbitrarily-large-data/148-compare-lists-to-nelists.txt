@@ -1,0 +1,11 @@
+> Exercise 148. Compare the function definitions from this section (sum,
+> how-many, all-true, one-true) with the corresponding function definitions
+> from the preceding sections. Is it better to work with data definitions that
+> accommodate empty lists as opposed to definitions for non-empty lists? Why?
+> Why not?
+
+
+The implementations are pretty similar. However, the empty list versions appear
+to be more concise, and non-empty lists more cumbersome to work with. Also, it
+seems like a better idea to handle empty lists just in case a list is, well,
+not a non-empty list.
