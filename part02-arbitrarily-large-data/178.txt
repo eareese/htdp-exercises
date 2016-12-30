@@ -1,0 +1,12 @@
+Exercise 178. Explain why the template for editor-kh deals with "\t" and "\r" before it checks for strings of length 1.
+
+
+Those "/t" and "/r" represent special key events such as hitting the tab key.
+
+Although there are two characters (slash and a letter) in between the sets of quote marks, calling
+
+  (string-length "\t")
+
+returns a length of 1.
+
+So, it makes sense to check for these special keys to ignore, before hitting the condition for other 1-length strings which will represent letter characters to display on the Editor.
