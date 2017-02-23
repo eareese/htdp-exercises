@@ -1,16 +1,26 @@
 #lang htdp/bsl
+;;---------------------------------------------------------------------------------------------------
+
+;; Sample Problem
+;; Design a game program using the 2htdp/universe library for playing a simple space invader game.
+;; The player is in control of a tank (a small rectangle) that must defend our planet (the bottom of
+;; the canvas) from a UFO (see Intervals for one possibility) that descends from the top of the
+;; canvas to the bottom. In order to stop the UFO from landing, the player may fire a single missile
+;; (a triangle smaller than the tank) by hitting the space bar. In response, the missile emerges from
+;; the tank. If the UFO collides with the missile, the player wins; otherwise the UFO lands and the
+;; player loses.
+
+;; Here are some details concerning the three game objects and their movements. First, the tank moves
+;; a constant speed along the bottom of the canvas though the player may use the left arrow key and
+;; the right arrow key to change directions. Second, the UFO descends at a constant velocity but
+;; makes small random jumps to the left or right. Third, once fired the missile ascends along a
+;; straight vertical line at a constant speed at least twice as fast as the UFO descends. Finally,
+;; the UFO and the missile collide if their reference points are close enough, for whatever you
+;; think “close enough” means.
+
 (require 2htdp/image)
 (require 2htdp/universe)
 
-; TODO there are so many improvements to make, but this is at a good point. Demoable!
-
-;; Sample Problem
-;; Design a game program using the 2htdp/universe library for playing a simple space invader game. The player is in control of a tank (a small rectangle) that must defend our planet (the bottom of the canvas) from a UFO (see Intervals for one possibility) that descends from the top of the canvas to the bottom. In order to stop the UFO from landing, the player may fire a single missile (a triangle smaller than the tank) by hitting the space bar. In response, the missile emerges from the tank. If the UFO collides with the missile, the player wins; otherwise the UFO lands and the player loses.
-
-;; Here are some details concerning the three game objects and their movements. First, the tank moves a constant speed along the bottom of the canvas though the player may use the left arrow key and the right arrow key to change directions. Second, the UFO descends at a constant velocity but makes small random jumps to the left or right. Third, once fired the missile ascends along a straight vertical line at a constant speed at least twice as fast as the UFO descends. Finally, the UFO and the missile collide if their reference points are close enough, for whatever you think “close enough” means.
-
-;; constants
-;; canvas
 (define CANVAS
   (scene+curve
    (scene+curve
@@ -32,13 +42,13 @@
   (overlay (circle 4 "solid" "green")
            (rectangle 20 2 "solid" "green")))
 (define UFO-DELTA-Y 1.5)
-(define UFO-MAX-DELTA-X 5)
+(define UFO-MAX-DELTA-X 10)
 
 (define MISSILE (triangle 12 "solid" "tan"))
 (define MISSILE-Y-OFFSET -10)
 (define MISSILE-DELTA-Y (* 2 UFO-DELTA-Y))
 
-;; used by in-reach?
+;; the range of detection used by in-reach?
 (define REACH 10)
 
 ;; Structure type definitions
@@ -47,16 +57,12 @@
 (define-struct tank [loc vel])
 
 
-
-
-; si-move
 ; SIGS -> SIGS
 ; consumes a SIGS and produces another SIGS where all the objects have moved,
 ; each in their own unique ways, after one clock tick
 (define (si-move s)
   (si-move-proper s (create-random-number s)))
 
-; si-move-proper
 ; SIGS Number -> SIGS
 ; do the moving on all objects, given prior SIGS and random number for ufo jump
 (check-expect (si-move-proper (make-aim (make-posn 50 25)
@@ -93,91 +99,66 @@
 ;; (check-random (create-random-number (make-aim (make-posn 45 67)
 ;;                                               (make-tank 54 76)))
 ;;               (random UFO-MAX-DELTA-X))
-; NOTE added another call to random so the jump can be positive or negative.
-; TODO now I don't know how to write the test using check-random
+; TODO This function needs a test or some, but can't use check-random in the same way
+; because of the new ordering of calls to random, and L/R jumping works okay for now.
 (define (create-random-number w)
   (if (eq? 0 (random 2))
-      (- (random UFO-MAX-DELTA-X)); random jump left for 0
-      (random UFO-MAX-DELTA-X))) ; random jump right for 1
+      (- (random UFO-MAX-DELTA-X))
+      (random UFO-MAX-DELTA-X)))
 
 
-; si-game-over?
 ; SIGS -> Boolean
 ; checks for one of two stop conditions:
 ; - when the UFO lands
 ; - when the missile hits the UFO
 (check-expect
- (si-game-over? (make-aim
-                 (make-posn 50 (image-height CANVAS))
-                 (make-tank 25 3)))
-              #t)
-(check-expect (si-game-over? (make-aim
-                              (make-posn 50 10)
-                              (make-tank 25 3)))
-              #f)
+ (si-game-over? (make-aim (make-posn 50 (image-height CANVAS)) (make-tank 25 3))) #t)
+(check-expect (si-game-over? (make-aim (make-posn 50 10) (make-tank 25 3))) #f)
 (define (si-game-over? s)
   (cond
-    [(>= (posn-y (if (aim? s)
-                     (aim-ufo s)
-                     (fired-ufo s)))
-         (image-height CANVAS))
-     #t] ;; ufo has landed!
-    [(and
-      (fired? s)
-      (in-reach? (fired-ufo s) (fired-missile s)))
-     #t] ;; missile hit!
+    ;; ufo has landed:
+    [(>= (posn-y (if (aim? s) (aim-ufo s) (fired-ufo s))) (image-height CANVAS))#t]
+    ;; missile hit:
+    [(and (fired? s) (in-reach? (fired-ufo s) (fired-missile s))) #t]
     [else #f]))
 
 
-; in-reach?
 ; Posn Posn -> Boolean
-; compares the proximity of the two positions using REACH constant, returning #t if they are close enough
+; compares proximity of the two positions using REACH constant, producing #t if they are close enough
 (check-expect (in-reach? (make-posn 10 10) (make-posn 100 100)) #f)
 (check-expect (in-reach? (make-posn 100 100) (make-posn 100 100)) #t)
 (define (in-reach? p1 p2)
-  (if (>= REACH
-          (sqrt
-           (+
-            (sqr (- (posn-x p2) (posn-x p1)))
-            (sqr (- (posn-y p2) (posn-y p1))))))
-      #t #f))
+  (>= REACH (sqrt (+ (sqr (- (posn-x p2) (posn-x p1))) (sqr (- (posn-y p2) (posn-y p1)))))))
 
 ; SIGS -> Image
 ; adds TANK, UFO, and possibly the MISSILE to BACKGROUND
 (define (si-render s)
   (cond
-    [(aim? s)
-     (tank-render (aim-tank s)
-                  (ufo-render (aim-ufo s) CANVAS))]
-    [(fired? s)
-     (tank-render (fired-tank s)
-                  (ufo-render (fired-ufo s)
-                              (missile-render (fired-missile s) CANVAS)))]))
+    [(aim? s) (tank-render (aim-tank s) (ufo-render (aim-ufo s) CANVAS))]
+    [(fired? s) (tank-render (fired-tank s)
+                             (ufo-render (fired-ufo s)
+                                         (missile-render (fired-missile s) CANVAS)))]))
 
 
-; si-render-final
 ; SIGS -> Image
-(check-expect (si-render-final
-               (make-aim (make-posn 20 10) (make-tank 28 -3)))
-              (overlay
-               (text "GAME OVER" 24 "red") CANVAS))
+; Consumes the final game state and produces the end-game image
+(check-expect (si-render-final (make-aim (make-posn 20 10) (make-tank 28 -3)))
+              (overlay (text "GAME OVER" 24 "red") CANVAS))
 (define (si-render-final w)
   (overlay (text "GAME OVER" 24 "red") CANVAS))
 
 
-; tank-render
 ; Tank Image -> Image
 ; adds t to the given image im
+;; Example:  (tank-render (make-tank 50 -3) CANVAS)
 (define (tank-render t im)
   (place-image TANK (tank-loc t) TANK-Y im))
-;; (tank-render (make-tank 50 -3) CANVAS)
 
-; ufo-render
 ; UFO Image -> Image
 ; adds u to the given image im
+;; Example:  (ufo-render (make-posn 50 50) CANVAS)
 (define (ufo-render u im)
   (place-image UFO (posn-x u) (posn-y u) im))
-;; (ufo-render (make-posn 50 50) CANVAS)
 
 ; missile-render
 ; Missile Image -> Image
@@ -186,8 +167,6 @@
   (place-image MISSILE (posn-x m) (posn-y m) im))
 
 
-
-; si-control
 ; SIGS KeyEvent -> SIGS
 ; returns a new game state, given a game state and a KeyEvent.
 ; left: move tank left
@@ -308,7 +287,6 @@
                              (posn-y (fired-missile s))))))
 
 
-; si-main
 (define (si-main s)
   (big-bang (make-aim (make-posn (/ (image-width CANVAS) 2) 10)
                       (make-tank (/ (image-width CANVAS) 2) TANK-DELTA-X))
