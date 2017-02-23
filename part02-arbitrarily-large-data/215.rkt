@@ -22,9 +22,9 @@
 ; size is worm diameter
 (define SIZE 10)
 (define PART (circle (/ SIZE 2) "solid" "blue"))
-
 (define SCALE 15)
 (define WORLD (empty-scene (* SCALE SIZE) (* SCALE SIZE)))
+(define MIDDLE (floor (/ SCALE 2)))
 
 
 ; A Direction is one of:
@@ -37,7 +37,8 @@
 (define-struct game [posn dir])
 ; A GameState is a structure:
 ;   (make-game Posn Direction)
-; INTERP: (make-game pos d) represents a Game when the Worm is at Posn pos, which counts the *number of segments away from the top-left*,
+; INTERP: (make-game pos d) represents a Game when the Worm is at Posn pos, which counts the *number
+;; of segments away from the top-left*,
 ; and Direction d.
 ; EXAMPLE: (make-game (make-posn 0 0) "right") is a game where the Worm is in the top left corner
 ; and is heading to the right.
@@ -46,17 +47,17 @@
 ; GameState -> Image
 ; Consumes a GameState and produces an Image that displays the state of the game.
 ;; (check-expect (render (make-game )))
-(check-expect (render (make-game (make-posn 0 0) "right"))
-              (place-image PART (/ SIZE 2) (/ SIZE 2) WORLD))
-(check-expect (render (make-game (make-posn 3 3) "right"))
+(check-expect (render (make-game (make-posn 1 0) "right"))
+              (place-image PART (+ (/ SIZE 2) (* 1 SIZE)) (+ (/ SIZE 2) (* 0 SIZE)) WORLD))
+(check-expect (render (make-game (make-posn (- SCALE 1) (- SCALE 1)) "down"))
               (place-image PART
-                           (+ (/ SIZE 2) (* 3 SIZE))
-                           (+ (/ SIZE 2) (* 3 SIZE))
+                           (+ (/ SIZE 2) (* (- SCALE 1) SIZE))
+                           (+ (/ SIZE 2) (* (- SCALE 1) SIZE))
                            WORLD))
 (define (render gs)
   (place-image PART
-               (+ (/ SIZE 2) (* (posn-x (game-posn gs)) SCALE))
-               (+ (/ SIZE 2) (* (posn-y (game-posn gs)) SCALE))
+               (+ (/ SIZE 2) (* (posn-x (game-posn gs)) SIZE))
+               (+ (/ SIZE 2) (* (posn-y (game-posn gs)) SIZE))
                WORLD))
 
 ; GameState -> GameState
@@ -72,15 +73,17 @@
               (make-game (make-posn 0 0) "up"))
 (check-expect (advance (make-game (make-posn (- SCALE 1) 0) "right"))
               (make-game (make-posn (- SCALE 1) 0) "right"))
+(check-expect (advance (make-game (make-posn 1 (- SCALE 1)) "down"))
+              (make-game (make-posn 1 (- SCALE 1)) "down"))
 (define (advance gs)
   (cond
     [(and (string=? (game-dir gs) "up") (> (posn-y (game-posn gs)) 0))
      (make-game (make-posn (posn-x (game-posn gs)) (- (posn-y (game-posn gs)) 1)) "up")]
-    [(and (string=? (game-dir gs) "down") (< (posn-y (game-posn gs)) SCALE))
+    [(and (string=? (game-dir gs) "down") (< (posn-y (game-posn gs)) (- SCALE 1)))
      (make-game (make-posn (posn-x (game-posn gs)) (+ (posn-y (game-posn gs)) 1)) "down")]
     [(and (string=? (game-dir gs) "left") (> (posn-x (game-posn gs)) 0))
      (make-game (make-posn (- (posn-x (game-posn gs)) 1) (posn-y (game-posn gs))) "left")]
-    [(and (string=? (game-dir gs) "right") (< (posn-x (game-posn gs)) SCALE))
+    [(and (string=? (game-dir gs) "right") (< (posn-x (game-posn gs)) (- SCALE 1)))
      (make-game (make-posn (+ (posn-x (game-posn gs)) 1) (posn-y (game-posn gs))) "right")]
     [else gs]))
 
@@ -89,35 +92,29 @@
 ; GameState KeyEvent -> GameState
 ; consumes a game and the key pressed and produces the next game, which is always the same except
 ; when the KeyEvent was a directional arrow (up, down, right, left). When it is one of those, the
-; Worm should change to that direction for the next GameState, unless it was going in the opposite
-; direction before, because the Worm shouldn't be able to travel into or through itself.
-(check-expect (move-worm (make-game (make-posn 3 4) "left") "right") (make-game (make-posn 3 4) "left"))
-(check-expect (move-worm (make-game (make-posn 3 4) "right") "left") (make-game (make-posn 3 4) "right"))
-(check-expect (move-worm (make-game (make-posn 3 4) "up") "down") (make-game (make-posn 3 4) "up"))
-(check-expect (move-worm (make-game (make-posn 3 4) "down") "up") (make-game (make-posn 3 4) "down"))
-(check-expect (move-worm (make-game (make-posn 3 4) "down") "down") (make-game (make-posn 3 4) "down"))
-(check-expect (move-worm (make-game (make-posn 3 4) "down") "left") (make-game (make-posn 3 4) "left"))
-(check-expect (move-worm (make-game (make-posn 3 4) "right") "down") (make-game (make-posn 3 4) "down"))
-(check-expect (move-worm (make-game (make-posn 3 4) "left") "up") (make-game (make-posn 3 4) "up"))
+; Worm should change to that direction for the next GameState
+(check-expect (move-worm (make-game (make-posn 3 4) "right") "left")
+              (make-game (make-posn 3 4) "left"))
+(check-expect (move-worm (make-game (make-posn 3 4) "down") "up")
+              (make-game (make-posn 3 4) "up"))
+(check-expect (move-worm (make-game (make-posn 3 4) "down") "down")
+              (make-game (make-posn 3 4) "down"))
+(check-expect (move-worm (make-game (make-posn 3 4) "down") "left")
+              (make-game (make-posn 3 4) "left"))
+(check-expect (move-worm (make-game (make-posn 3 4) "right") "down")
+              (make-game (make-posn 3 4) "down"))
+(check-expect (move-worm (make-game (make-posn 3 4) "left") "up")
+              (make-game (make-posn 3 4) "up"))
 (define (move-worm gs ke)
-  (cond
-    [(and (string=? ke "up") (not (string=? (game-dir gs) "down")))
-     (make-game (game-posn gs) "up")]
-    [(and (string=? ke "down") (not (string=? (game-dir gs) "up")))
-     (make-game (game-posn gs) "down")]
-    [(and (string=? ke "left") (not (string=? (game-dir gs) "right")))
-     (make-game (game-posn gs) "left")]
-    [(and (string=? ke "right") (not (string=? (game-dir gs) "left")))
-     (make-game (game-posn gs) "right")]
-    [else gs]))
+  (if (or (string=? "up" ke) (string=? "down" ke) (string=? "left" ke) (string=? "right" ke))
+      (make-game (make-posn (posn-x (game-posn gs)) (posn-y (game-posn gs))) ke)
+      gs))
 
-; main
 
-(define MIDDLE (floor (/ SCALE 2)))
 (define (game-main t)
   (big-bang (make-game (make-posn MIDDLE MIDDLE) "left")
             [on-tick advance t]
             [to-draw render]
             [on-key move-worm]))
 
-(game-main (/ 1 8))
+(game-main (/ 1 4))
