@@ -14,8 +14,8 @@ For further explanation the reasoning behind this approach, read [the Preface](h
 
 Some highlights from recent exercise solutions.
 
-  - [UFO game](https://github.com/eareese/htdp-exercises/blob/master/part01-fixed-size-data/ufo.rkt)
-  - [iTunes XML data total-time-list](https://github.com/eareese/htdp-exercises/blob/master/part02-arbitrarily-large-data/207-total-time-list.rkt)
+  - [UFO game](part01-fixed-size-data/ufo.rkt)
+  - [iTunes XML data total-time-list](part02-arbitrarily-large-data/207-total-time-list.rkt)
 
 
 
