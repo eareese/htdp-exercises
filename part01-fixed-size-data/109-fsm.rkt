@@ -12,14 +12,6 @@
 (define WIDTH 100)
 (define HEIGHT 100)
 
-(define WORLD (empty-scene WIDTH HEIGHT "white"))
-
-; A WorldState is a String and must be one of:
-; - "init"      displays white when the world begins and no input has yet been received.
-; - "progress"  displays yellow when a  desired letter has been received.
-; - "complete"  displays green after encountering the final letter.
-; - "error"     displays red if a bad or invalid key input is received.
-
 ; ExpectsToSee is one of:
 ; - AA
 ; - BB
@@ -32,52 +24,45 @@
 
 
 ; render
-; WorldState -> Image
-; produces the display image for the given ws.
-(check-expect (render "error") (empty-scene WIDTH HEIGHT "red"))
-(check-expect (render "complete") (empty-scene WIDTH HEIGHT "green"))
-(check-expect (render "progress") (empty-scene WIDTH HEIGHT "yellow"))
-(check-expect (render "init") (empty-scene WIDTH HEIGHT "white"))
-(define (render ws) (empty-scene WIDTH HEIGHT
-                                 (cond
-                                   [(string=? "progress" ws) "yellow"]
-                                   [(string=? "complete" ws) "green"]
-                                   [(string=? "error" ws) "red"]
-                                   [else "white"]
-                                   )))
+; ExpectsToSee -> Image
+; produces the display image for the given ETS world state.
+(check-expect (render ER) (empty-scene WIDTH HEIGHT "red"))
+(check-expect (render DD) (empty-scene WIDTH HEIGHT "green"))
+(check-expect (render BB) (empty-scene WIDTH HEIGHT "yellow"))
+(check-expect (render AA) (empty-scene WIDTH HEIGHT "white"))
+(define (render ws)
+  (empty-scene WIDTH HEIGHT
+               (cond
+                 [(string=? BB ws) "yellow"]
+                 [(string=? DD ws) "green"]
+                 [(string=? ER ws) "red"]
+                 [else "white"]
+                 )))
 
 ; key-handler
-; WorldState KeyEvent -> WorldState
-; produces the next ws, depending on whether a key event occurred and whether a "desired" key was
-; pressed. (see the data definition for ExpectsToSee)
-(check-expect (key-handler "init" "a") "progress")
-(check-expect (key-handler "init" "p") "error")
-(check-expect (key-handler "progress" "b") "progress")
-(check-expect (key-handler "progress" "c") "progress")
-(check-expect (key-handler "progress" "x") "error")
-(check-expect (key-handler "progress" "d") "complete")
+; ExpectsToSee KeyEvent -> ExpectsToSee
+; produces the next ETS world state, depending on whether a key event occurred and whether a
+; "desired" key was pressed. According to the data definition, desired keys are in (a, b, c, d)
+(check-expect (key-handler AA "a") BB)
+(check-expect (key-handler AA "p") ER)
+(check-expect (key-handler BB "b") BB)
+(check-expect (key-handler BB "c") BB)
+(check-expect (key-handler BB "x") ER)
+(check-expect (key-handler BB "d") DD)
 (define (key-handler ws ke)
   (cond
-    [(and (string=? "init" ws) (string=? "a" ke)) "progress"]
-    [(and (string=? "progress" ws) (string=? "b" ke)) "progress"]
-    [(and (string=? "progress" ws) (string=? "c" ke)) "progress"]
-    [(and (string=? "progress" ws) (string=? "d" ke)) "complete"]
-    [(string=? "complete" ws) "complete"] ; "complete" is a final state
-    [else "error"])) ; "error" is the other final state
-
-; final-state?
-; WorldState -> Boolean
-; produces true if the ws is in "complete" or "error" state.
-(check-expect (final-state? "init") #f)
-(check-expect (final-state? "progress") #f)
-(check-expect (final-state? "complete") #t)
-(check-expect (final-state? "error") #t)
-(define (final-state? ws) (or (string=? "complete" ws) (string=? "error" ws)))
+    [(and (string=? AA ws) (string=? "a" ke)) BB]
+    [(and (string=? BB ws) (string=? "b" ke)) BB]
+    [(and (string=? BB ws) (string=? "c" ke)) BB]
+    [(and (string=? BB ws) (string=? "d" ke)) DD]
+    [(string=? DD ws) DD]
+    [else ER]))
 
 ; main
 (define (main ws)
          (big-bang ws
            [on-key key-handler]
-           [stop-when final-state?]
            [to-draw render]))
 
+
+(main AA)
